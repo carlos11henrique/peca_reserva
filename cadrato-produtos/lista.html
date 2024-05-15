@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Peças</title>
+    <link rel="stylesheet" href="lista.css">
+    <link rel="stylesheet" href="./vendor/bootstrap-5.3.3-dist/css/bootstrap.css">
+
+
+</head>
+
+<body>
+<!-- so esta aqui por causa do bootstrap-->
+    <style>
+        body{
+    background-color: #FEF9EA;
+}
+
+    </style>
+    <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+        <div class="container-sm">
+            <a class="navbar-brand" href="#">Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Cadastrar
+                            <span class="visually-hidden">(current)</span>
+                        </a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="lista.html">Lista</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="ecomece.html">E-commerce</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="calendario.html">calendário</a>
+                        </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section> 
+    <h1>Lista de Peças</h1>
+
+    <button id="buscar">Buscar</button>
+
+    <ul id="produtos">
+        
+    </ul>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js"
+
+        import { getFirestore, doc, collection, serverTimestamp, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js"
+
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCjaQCG210hmK74C2_XImjQ1p7p8RYRCWM",
+            authDomain: "peca-4e2b2.firebaseapp.com",
+            projectId: "peca-4e2b2",
+            storageBucket: "peca-4e2b2.appspot.com",
+            messagingSenderId: "224852416031",
+            appId: "1:224852416031:web:79b29796867d1dad6a672a",
+            measurementId: "G-MTRQLGRE5B"
+        };
+
+
+        // Inicialize o Firebase
+        const app = initializeApp(firebaseConfig);
+
+        const db = getFirestore(app)
+        const storage = getStorage(app)
+
+        // Função para carregar os dados do Firestore e mostrar na lista
+        async function carregarDados() {
+            document.getElementById('produtos').innerHTML = '';
+
+            const querySnapshot = await getDocs(collection(db, "produtos"));
+            querySnapshot.forEach(async (doc) => {
+                const dados = doc.data();
+                const descricao = dados.descricao;
+                const imagem = dados.img;
+                const nome = dados.nome;
+                const preco = dados.preco;
+                const quantidade = dados.quantidade;
+                const timestamp = dados.timestamp;
+                const url = await getDownloadURL(ref(storage, imagem))
+
+                
+                const li = document.createElement('li');
+                li.innerHTML += `
+                <img src="${url}" alt="${nome}" style="width: 100px; height: auto;">
+                <p><strong>Nome:</strong> ${nome}</p>
+                <p><strong>Descrição:</strong> ${descricao}</p>
+                <p><strong>Preço:</strong> ${preco}</p>
+                <p><strong>Quantidade:</strong> ${quantidade}</p>
+                <p><strong>Timestamp:</strong> ${timestamp}</p>
+                <p><strong>Valor total:</strong> ${quantidade*preco}</p>
+
+            `;
+                document.getElementById('produtos').appendChild(li);
+            });
+
+
+        }
+        document.getElementById('buscar').addEventListener('click', carregarDados);
+
+    </script>
+    </section>
+
+</body>
+
+</html>
